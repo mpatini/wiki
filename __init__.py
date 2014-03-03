@@ -3,7 +3,7 @@ from sqlite3 import dbapi2 as sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash
 
-# create the app!
+# create the app
 app = Flask(__name__, instance_path='/var/www/wiki/instance')
 app.config.from_object(__name__)
 
