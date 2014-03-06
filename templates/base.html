@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<link type="text/css" rel="stylesheet" href="/static/main.css" />
+		<!-- /css/style.css?v=<?php echo date('his'); ?> -->
+		<link type="text/css" rel="stylesheet" href="/static/main.css?v=1.2" />
 		<title>Wiki</title>
 	</head>
 
@@ -11,7 +12,12 @@
 		</a>
 
 		<div class="login_area">
-			<a class="login_link" href="/edit">edit</a>
+			{% if title %}
+				<a class="login_link" href="/update_edit/{{ title }}">
+			{% else %}
+				<a class="login_link" href="/update_edit">
+			{% endif %}
+			edit</a>
 			|
 			<a class="login_link" href="/history">history</a>
 
@@ -26,7 +32,18 @@
     	{% endif %}
   	</div>
 
-  	<div id="content">
+<!--
+  	<div id="sidebar">
+  		{% for entry in entries %}
+    		<a href="/{{ entry.title }}"><strong><p>{{ entry.title }}</p><strong></a>
+    		<br>
+  		{% else %}
+    		<strong><p>Unbelievable.  No entries here so far!</p><strong>
+  		{% endfor %}	
+  	</div>
+-->
+
+  	<div id="page">
   		{% block content %}
   		{% endblock %}
   	</div>

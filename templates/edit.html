@@ -1,9 +1,15 @@
 {% extends "base.html" %}
 
 {% block content %}
-
-	<form method="post">
-		<textarea name="content">{{content}}</textarea>
+	{% if update %}
+		<form method="post" action="{{ url_for('update_entry', title=title) }}" class="add-entry">
+	{% else %}
+		<form method="post" action="{{ url_for('add_entry', title=title) }}" class="add-entry">
+	{% endif %}
+		<!-- <h2>Title:</h2>
+		<input type=text size=30 name=title>
+		<h2>Content:</h2> -->
+		<textarea name="content">{{text}}</textarea>
 		<br>
 		<input type="submit">
 
@@ -11,6 +17,4 @@
 				{{error}}
 		</div>
 	</form>
-
-
 {% endblock %}
