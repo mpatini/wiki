@@ -16,7 +16,7 @@ app.config.from_envvar('WIKI_SETTINGS', silent=True)
 
 
 """
-Setting up database
+Setting up primary database
 """
 def connect_db():
     """Connects to the specific database."""
@@ -53,6 +53,8 @@ def close_db(error):
     """Closes the database again at the end of the request."""
     if hasattr(g, 'sqlite_db'):
         g.sqlite_db.close()
+
+
 
 
 """
@@ -92,10 +94,6 @@ def viewpage(title):
         return redirect(url_for('editpage', title=title))
     else:
         return render_template("wiki.html", entry=entry['text'])
-        
-@app.route("/history")
-def history():
-    return "We are in development"
 
 # edit handler just for no addon
 @app.route('/edit')
@@ -110,6 +108,8 @@ def editpage(title):
 # add the new entry from the editpage handler
 @app.route('/add/<title>', methods=['POST'])
 def add_entry(title):
+    global versions
+    versions[title] = 0
     db = get_db()
     db.execute('INSERT INTO entries (title, text) VALUES (?, ?)',
                  [title, request.form['content']])
@@ -131,7 +131,16 @@ def update_edit(title):
 
 @app.route('/update/<title>', methods=['POST'])
 def update_entry(title):
+    global versions
+    versions[title] += 1
+    version = versions[title]
     db = get_db()
+    # create a version
+    entry = query_db("SELECT * FROM entries WHERE title = ?", [title], one=True)
+    db.execute('INSERT INTO entries (title, text) VALUES (?, ?)',
+                 [title + "v%s" % version, entry['text']])
+    db.commit()
+    # update entry
     db.execute('UPDATE entries SET text=? WHERE title=?', (request.form['content'], title))
     db.commit()
     if title == "|":
@@ -142,6 +151,54 @@ def update_entry(title):
 def push_title():
     global push_title
     return dict(title=push_title)
+
+versions = {}
+
+
+"""
+Primary History Functions
+"""
+# Note: will also need to modify push_title() above, and modify update to
+# add a version to the database before overwriting
+@app.route("/history/<title>")
+def history(title):
+    global push_title
+    push_title = title
+    db = get_db()
+    cur = db.execute('SELECT title, text FROM entries ORDER BY id desc')
+    entries = cur.fetchall()
+    # create list with appropriate names
+    i = versions[title]
+    history = [[title]]
+    while i > 0:
+        history.append([title + "v%s" % i])
+        i -= 1
+    # populate dictioanry
+    for entry in entries:
+        for version in history:
+            if entry['title'] == version[0]:
+                version.append(entry['text'])
+    return render_template("history_index.html", history=history)
+
+"""
+Current status:
+    -history(title) currently doesn't create a list of links that
+    can be edited, but rather creates a list of the titles
+To do for history:
+    -Must change to have an edit button that inputs the data of that
+    version to an edit for the current versions
+    -Must add datetime to add and update Functions, so need to update
+    database schema
+    -Must append versions with datetime and version number
+    -Write history function that is specific to homepage
+    -Then: On to sessions
+
+"""
+
+
+"""
+Sessions
+"""
 
 
 

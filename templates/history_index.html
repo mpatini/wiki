@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+	<ul class="history">
+		{% for item in history %}
+    		<li>{{ item[0] }}</li>
+		{% endfor %}
+	</ul>
+
+{% endblock %}
