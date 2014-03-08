@@ -2,6 +2,9 @@ import os
 from sqlite3 import dbapi2 as sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template
+from datetime import datetime
+from utils import convert_datetime
+from operator import itemgetter
 
 # create the app
 app = Flask(__name__, instance_path='/var/www/wiki/instance')
@@ -61,7 +64,7 @@ def close_db(error):
 The View Functions
 """
 push_title = ''
-
+versions = {}
 """
 # view a list of possible titles
 @app.route('/')
@@ -82,7 +85,7 @@ def homepage():
     if entry is None:
         return redirect(url_for('edit_homepage', title=title))
     else:
-        return render_template("wiki.html", entry=entry['text'])
+        return render_template("wiki.html", entry=entry['text'], version=entry['version'])
 
 # individual wiki page
 @app.route("/<title>")
@@ -93,10 +96,10 @@ def viewpage(title):
     if entry is None:
         return redirect(url_for('editpage', title=title))
     else:
-        return render_template("wiki.html", entry=entry['text'])
+        return render_template("wiki.html", entry=entry['text'], version=entry['version'])
 
 # edit handler just for no addon
-@app.route('/edit')
+@app.route('/_edit')
 def edit_homepage():
     return render_template("edit.html", title='|')
 
@@ -109,19 +112,21 @@ def editpage(title):
 @app.route('/add/<title>', methods=['POST'])
 def add_entry(title):
     global versions
-    versions[title] = 0
+    versions[title] = 1
+    current_date = convert_datetime(str(datetime.now()))
     db = get_db()
-    db.execute('INSERT INTO entries (title, text) VALUES (?, ?)',
-                 [title, request.form['content']])
+    db.execute('INSERT INTO entries (title, text, my_date, version) VALUES (?, ?, ?, ?)',
+                 [title, request.form['content'], current_date, versions[title]])
     db.commit()
     #flash('New entry was successfully posted')
     if title == "|":
         return redirect(url_for('homepage'))
     return redirect(url_for('viewpage', title=title))
 
-@app.route('/update_edit')
+
+@app.route('/_update_edit')
 def update_home():
-    entry = query_db("SELECT * FROM entries WHERE title = |", one=True)
+    entry = query_db("SELECT * FROM entries WHERE title = ?", ["|"], one=True)
     return render_template("edit.html", title='|', update=True, text=entry['text'])
 
 @app.route('/update_edit/<title>')
@@ -132,16 +137,17 @@ def update_edit(title):
 @app.route('/update/<title>', methods=['POST'])
 def update_entry(title):
     global versions
-    versions[title] += 1
     version = versions[title]
+    versions[title] += 1
+    current_date = convert_datetime(str(datetime.now()))
     db = get_db()
     # create a version
     entry = query_db("SELECT * FROM entries WHERE title = ?", [title], one=True)
-    db.execute('INSERT INTO entries (title, text) VALUES (?, ?)',
-                 [title + "v%s" % version, entry['text']])
+    db.execute('INSERT INTO entries (title, text, my_date, version) VALUES (?, ?, ?, ?)',
+                 [title + "v%s" % version, entry['text'], entry['my_date'], version])
     db.commit()
     # update entry
-    db.execute('UPDATE entries SET text=? WHERE title=?', (request.form['content'], title))
+    db.execute('UPDATE entries SET text=?, my_date=?, version=? WHERE title=?', (request.form['content'], current_date, versions[title], title))
     db.commit()
     if title == "|":
         return redirect(url_for('homepage'))
@@ -151,8 +157,6 @@ def update_entry(title):
 def push_title():
     global push_title
     return dict(title=push_title)
-
-versions = {}
 
 
 """
@@ -165,32 +169,42 @@ def history(title):
     global push_title
     push_title = title
     db = get_db()
-    cur = db.execute('SELECT title, text FROM entries ORDER BY id desc')
+    cur = db.execute('SELECT title, text, version FROM entries ORDER BY id desc')
     entries = cur.fetchall()
     # create list with appropriate names
     i = versions[title]
-    history = [[title]]
+    history = []
     while i > 0:
-        history.append([title + "v%s" % i])
+        if i == 1:
+            history.append([title])
+        else:
+            history.append([title + "v%s" % i])
+        print "history: " + str(history)
         i -= 1
-    # populate dictioanry
+    # populate list
     for entry in entries:
+        print "entry: " + str(entry['title'])
         for version in history:
             if entry['title'] == version[0]:
                 version.append(entry['text'])
-    return render_template("history_index.html", history=history)
+                version.append(entry['version'])
+                print "history: " + str(history)
+    print "history: " + str(history)
+    #history_sorted = sorted(history, key=itemgetter(2))
+    return render_template("history_index.html", history=history, title=title)#
 
 """
 Current status:
     -history(title) currently doesn't create a list of links that
     can be edited, but rather creates a list of the titles
 To do for history:
+    -fix around lines 139 and 184 and add and update functions
+    -Must add links to that version
+    -Must update html to create rows that look cool
     -Must change to have an edit button that inputs the data of that
     version to an edit for the current versions
-    -Must add datetime to add and update Functions, so need to update
-    database schema
-    -Must append versions with datetime and version number
     -Write history function that is specific to homepage
+    -Edit history link so that those related to the homepage have an _
     -Then: On to sessions
 
 """

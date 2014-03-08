@@ -31,3 +31,8 @@ def make_pw_hash(name, pw, salt = None):
 def valid_pw(name, password, h):
     salt = h.split(',')[0]
     return h == make_pw_hash(name, password, salt)
+
+def convert_datetime(date):
+    index = date.find('.')
+    new_date = date[:index]
+    return new_date

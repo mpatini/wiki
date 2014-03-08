@@ -12,10 +12,10 @@
 		</a>
 
 		<div class="login_area">
-			{% if title %}
-				<a class="login_link" href="/update_edit/{{ title }}">
+			{% if title == "|" %}
+				<a class="login_link" href="/_update_edit">
 			{% else %}
-				<a class="login_link" href="/update_edit">
+				<a class="login_link" href="/update_edit/{{ title }}">
 			{% endif %}
 			edit</a>
 			|
