@@ -3,7 +3,7 @@ from sqlite3 import dbapi2 as sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template
 from datetime import datetime
-from utils import get_month, get_dayofweek, get_datetime
+from utils import convert_datetime
 from operator import itemgetter
 
 # create the app
@@ -113,7 +113,7 @@ def editpage(title):
 def add_entry(title):
     global versions
     versions[title] = 1
-    current_date = get_datetime()
+    current_date = convert_datetime(str(datetime.now()))
     db = get_db()
     db.execute('INSERT INTO entries (title, text, my_date, version) VALUES (?, ?, ?, ?)',
                  [title, request.form['content'], current_date, versions[title]])
@@ -139,7 +139,7 @@ def update_entry(title):
     global versions
     version = versions[title]
     versions[title] += 1
-    current_date = get_datetime()
+    current_date = convert_datetime(str(datetime.now()))
     db = get_db()
     # create a version
     entry = query_db("SELECT * FROM entries WHERE title = ?", [title], one=True)
@@ -169,13 +169,13 @@ def history(title):
     global push_title
     push_title = title
     db = get_db()
-    cur = db.execute('SELECT title, text, my_date, version FROM entries ORDER BY id desc')
+    cur = db.execute('SELECT title, text, version FROM entries ORDER BY id desc')
     entries = cur.fetchall()
     # create list with appropriate names
-    i = versions[title] - 1
+    i = versions[title]
     history = []
-    while i >= 0:
-        if i == 0:
+    while i > 0:
+        if i == 1:
             history.append([title])
         else:
             history.append([title + "v%s" % i])
@@ -188,11 +188,10 @@ def history(title):
             if entry['title'] == version[0]:
                 version.append(entry['text'])
                 version.append(entry['version'])
-                version.append(entry['my_date'])
                 print "history: " + str(history)
     print "history: " + str(history)
-    history_sorted = sorted(history, key=itemgetter(2), reverse=True)
-    return render_template("history_index.html", history=history_sorted, title=title)
+    #history_sorted = sorted(history, key=itemgetter(2))
+    return render_template("history_index.html", history=history, title=title)#
 
 """
 Current status:
