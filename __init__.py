@@ -2,8 +2,7 @@ import os
 from sqlite3 import dbapi2 as sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template
-from datetime import datetime
-from utils import get_month, get_dayofweek, get_datetime
+from utils import get_datetime
 from operator import itemgetter
 
 # create the app
@@ -85,7 +84,7 @@ def homepage():
     if entry is None:
         return redirect(url_for('edit_homepage', title=title))
     else:
-        return render_template("wiki.html", entry=entry['text'], version=entry['version'])
+        return render_template("wiki.html", entry=entry['text'])
 
 # individual wiki page
 @app.route("/<title>")
@@ -96,7 +95,7 @@ def viewpage(title):
     if entry is None:
         return redirect(url_for('editpage', title=title))
     else:
-        return render_template("wiki.html", entry=entry['text'], version=entry['version'])
+        return render_template("wiki.html", entry=entry['text'])
 
 # edit handler just for no addon
 @app.route('/_edit')
@@ -162,8 +161,37 @@ def push_title():
 """
 Primary History Functions
 """
-# Note: will also need to modify push_title() above, and modify update to
-# add a version to the database before overwriting
+@app.route("/_history")
+def history_homepage():
+    global push_title
+    title = "|"
+    push_title = title
+    db = get_db()
+    cur = db.execute('SELECT title, text, my_date, version FROM entries ORDER BY id desc')
+    entries = cur.fetchall()
+    # create list with appropriate names
+    i = versions[title] - 1
+    history = []
+    while i >= 0:
+        if i == 0:
+            history.append([title])
+        else:
+            history.append([title + "v%s" % i])
+        print "history: " + str(history)
+        i -= 1
+    # populate list
+    for entry in entries:
+        print "entry: " + str(entry['title'])
+        for version in history:
+            if entry['title'] == version[0]:
+                version.append(entry['text'])
+                version.append(entry['version'])
+                version.append(entry['my_date'])
+                print "history: " + str(history)
+    print "history: " + str(history)
+    history_sorted = sorted(history, key=itemgetter(2), reverse=True)
+    return render_template("history_index.html", history=history_sorted, title=title)
+    
 @app.route("/history/<title>")
 def history(title):
     global push_title
@@ -194,16 +222,13 @@ def history(title):
     history_sorted = sorted(history, key=itemgetter(2), reverse=True)
     return render_template("history_index.html", history=history_sorted, title=title)
 
+
 """
 Current status:
     -history(title) currently doesn't create a list of links that
     can be edited, but rather creates a list of the titles
 To do for history:
-    -fix around lines 139 and 184 and add and update functions
-    -Must add links to that version
-    -Must update html to create rows that look cool
-    -Must change to have an edit button that inputs the data of that
-    version to an edit for the current versions
+    -Must add links for that specific version
     -Write history function that is specific to homepage
     -Edit history link so that those related to the homepage have an _
     -Then: On to sessions

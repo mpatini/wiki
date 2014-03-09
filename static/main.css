@@ -57,3 +57,31 @@ textarea {
 input[type=submit] {
   font-size: 24px;
 }
+
+#history {
+    position:fixed;
+    top: 75px;
+    left: 70px;
+    right: 70px;
+    margin-bottom: 30px;
+}
+
+.TFtable{
+    width:100%; 
+    border-collapse:collapse; 
+}
+.TFtable td{ 
+    padding:7px; border:#4e95f4 1px solid;
+}
+/* provide some minimal visual accomodation for IE8 and below */
+.TFtable tr{
+    background: #b8d1f3;
+}
+/*  Define the background color for all the ODD background rows  */
+.TFtable tr:nth-child(odd){ 
+    background: #b8d1f3;
+}
+/*  Define the background color for all the EVEN background rows  */
+.TFtable tr:nth-child(even){
+    background: #dae5f4;
+}

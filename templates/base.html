@@ -2,7 +2,8 @@
 <html>
 	<head>
 		<!-- /css/style.css?v=<?php echo date('his'); ?> -->
-		<link type="text/css" rel="stylesheet" href="/static/main.css?v=1.2" />
+		<link type="text/css" rel="stylesheet" href="/static/main.css?v=3.8" />
+		<script type="text/javascript" src="/static/script.js"></script>
 		<title>Wiki</title>
 	</head>
 
@@ -19,7 +20,12 @@
 			{% endif %}
 			edit</a>
 			|
-			<a class="login_link" href="/history/{{ title }}">history</a>
+			{% if title == "|" %}
+				<a class="login_link" href="{{ url_for('history_homepage') }}">
+			{% else %}
+				<a class="login_link" href="/history/{{ title }}">
+			{% endif %}
+			history</a>
 
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
@@ -42,6 +48,10 @@
   		{% endfor %}	
   	</div>
 -->
+		<div id='history'>
+			{% block history_content %}
+			{% endblock %}
+		</div>
 
   	<div id="page">
   		{% block content %}

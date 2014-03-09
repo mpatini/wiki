@@ -33,6 +33,10 @@ def valid_pw(name, password, h):
     salt = h.split(',')[0]
     return h == make_pw_hash(name, password, salt)
 
+
+"""
+To get_datetime()
+"""
 def get_month(month_int):
     months = dict(January=1, February=2, March=3, April=4, May=5, June=6, July=7, August=8, September=9, October=10, November=11, December=12)
     for month, num in months.iteritems():
