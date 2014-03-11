@@ -6,15 +6,12 @@
 	{% else %}
 		<form method="post" action="{{ url_for('add_entry', title=title) }}" class="add-entry">
 	{% endif %}
-		<!-- <h2>Title:</h2>
-		<input type=text size=30 name=title>
-		<h2>Content:</h2> -->
-		<textarea name="content">{{text}}</textarea>
-		<br>
-		<input type="submit">
+			<textarea name="content">{{text}}</textarea>
+			<br>
+			<input type="submit">
 
-		<div class="error">
-				{{error}}
-		</div>
-	</form>
+			<div class="error">
+					{{error}}
+			</div>
+		</form>
 {% endblock %}
