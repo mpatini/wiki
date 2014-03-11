@@ -12,16 +12,16 @@
 					{{ item[1] }}
 				</td>
 				<td>
-					{% if history_edit %}
-						<a class="login_link" href="{{ url_for('history_update', title=item[0]) }}">edit</a>
-					{% else %}
+					{% if item[4] %}
 						{% if title == "|" %}
 							<a class="login_link" href="/_update_edit">
 						{% else %}
 							<a class="login_link" href="/update_edit/{{ title }}">
 						{% endif %}
+						edit</a>
+					{% else %}
+						<a class="login_link" href="{{ url_for('history_update', title=item[0]) }}">edit</a>
 					{% endif %}
-					edit</a>
 				</td>
 				<td>
 					<a class="login_link" href="{{ url_for('viewpage', title=item[0]) }}">view</a>

@@ -4,6 +4,7 @@ from flask import Flask, request, session, g, redirect, url_for, render_template
 from utils import get_datetime, trunc_version, valid_username, valid_password
 from operator import itemgetter
 from flaskext.bcrypt import Bcrypt
+from secret import secret
 
 # create the app
 app = Flask(__name__, instance_path='/var/www/wiki/instance')
@@ -234,7 +235,6 @@ def history_homepage():
                 version.append(entry['text'])
                 version.append(entry['version'])
                 version.append(entry['my_date'])
-                print "history: " + str(history)
     history_sorted = sorted(history, key=itemgetter(2), reverse=True)
     return render_template("history_index.html", history=history_sorted, title=title)
     
@@ -265,6 +265,7 @@ def history(title):
                 version.append(entry['text'])
                 version.append(entry['version'])
                 version.append(entry['my_date'])
+                version.append(entry['current'])
     history_sorted = sorted(history, key=itemgetter(2), reverse=True)
     return render_template("history_index.html", history=history_sorted, title=title)
 
@@ -356,7 +357,12 @@ def logout():
     session.pop('username', None)
     return redirect(back)
 
-app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
+"""
+Last thing to fix before deploying to server:
+Fix edit from within history
+"""
+
+app.secret_key = secret()
 
 
 
