@@ -12,7 +12,7 @@ app.config.from_object(__name__)
 bcrypt = Bcrypt(app)
 
 app.config.update(dict(
-    DATABASE=os.path.join(app.root_path, 'wiki.db'),
+    DATABASE=os.path.join(app.instance_path, 'wiki.db'),
     DEBUG=True,
     SECRET_KEY='development key',
 ))
