@@ -12,7 +12,7 @@ app.config.from_object(__name__)
 bcrypt = Bcrypt(app)
 
 app.config.update(dict(
-    DATABASE=os.path.join(app.root_path, 'wiki.db'),
+    DATABASE=os.path.join(app.instance_path, 'wiki.db'),
     DEBUG=True,
     SECRET_KEY='development key',
 ))
@@ -365,7 +365,7 @@ app.secret_key = secret()
 
 if __name__ == '__main__':
     init_db()
-    app.run(debug=True)
+    app.run(host='107.170.69.45')
     #host='107.170.69.45'
 
 
