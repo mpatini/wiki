@@ -130,7 +130,7 @@ def edit_homepage():
 @app.route('/edit/<title>')
 def editpage(title):
     if 'username' in session:
-	   return render_template("edit.html", title=title)
+       return render_template("edit.html", title=title)
     else:
         return redirect(url_for('login'))
 
@@ -327,11 +327,11 @@ def register():
         session['username'] = username
         return redirect(back)
 
-@app.route('/login')
+@app.route('/login_form')
 def login_form():
     return render_template('login.html')
 
-@app.route('/loggingin', methods=['POST'])
+@app.route('/login', methods=['POST'])
 def login():
     global back
     params = dict()
@@ -366,5 +366,3 @@ if __name__ == '__main__':
     init_db()
     app.run(host='107.170.69.45')
     #host='107.170.69.45'
-
-
