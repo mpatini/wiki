@@ -217,7 +217,7 @@ def history_homepage():
     push_title = title
     push_history_edit = False
     db = get_db()
-    cur = db.execute('SELECT title, text, my_date, version, current FROM entries ORDER BY id desc')
+    cur = db.execute('SELECT * FROM entries ORDER BY id desc')
     entries = cur.fetchall()
     # create list with appropriate names
     i = versions[title] - 1
@@ -248,7 +248,7 @@ def history(title):
     push_title = title
     push_history_edit = False
     db = get_db()
-    cur = db.execute('SELECT title, text, my_date, version, current FROM entries ORDER BY id desc')
+    cur = db.execute('SELECT * FROM entries ORDER BY id desc')
     entries = cur.fetchall()
     # create list with appropriate names
     i = versions[title] - 1
