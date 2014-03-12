@@ -357,11 +357,6 @@ def logout():
     session.pop('username', None)
     return redirect(back)
 
-"""
-Last thing to fix before deploying to server:
-Fix edit from within history
-"""
-
 app.secret_key = secret()
 
 
@@ -369,13 +364,7 @@ app.secret_key = secret()
 
 if __name__ == '__main__':
     init_db()
-    app.run(host='107.170.69.45')#host='107.170.69.45'
+    app.run(host='107.170.69.45')
+    #host='107.170.69.45'
 
 
-"""
-entry = query_db("SELECT * FROM users WHERE username = ?", [username], one=True)
-temp = dict(username=entry['username'], hpw=entry['hpw'], my_date=entry['my_date'])
-return render_template('test.html', **temp)#redirect(url_for('homepage'))
-"""
-
-# I really think that Michael sucks. He keeps trying to push all his website propaganda onto me. I don't want his propaganda. I am an independent thinker. And also a little drunk. I was just drinking margaritas at Copa. Happy Wednesday!
