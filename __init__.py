@@ -127,7 +127,7 @@ def edit_homepage():
         return redirect(url_for('login'))
 
 # edit the wiki page
-@app.route('/_edit/<title>')
+@app.route('/edit/<title>')
 def editpage(title):
     if 'username' in session:
 	   return render_template("edit.html", title=title)
@@ -135,7 +135,7 @@ def editpage(title):
         return redirect(url_for('login'))
 
 # add the new entry from the editpage handler
-@app.route('/_add/<title>', methods=['POST'])
+@app.route('/add/<title>', methods=['POST'])
 def add_entry(title):
     if 'username' in session:
         global versions
@@ -158,7 +158,7 @@ def update_home():
     entry = query_db("SELECT * FROM entries WHERE title = ?", ["|"], one=True)
     return render_template("edit.html", title='|', update=True, text=entry['text'])
 
-@app.route('/_update_edit/<title>')
+@app.route('/update_edit/<title>')
 def update_edit(title):
     entry = query_db("SELECT * FROM entries WHERE title = ?", [title], one=True)
     return render_template("edit.html", title=title, update=True, text=entry['text'])
@@ -238,7 +238,7 @@ def history_homepage():
     history_sorted = sorted(history, key=itemgetter(2), reverse=True)
     return render_template("history_index.html", history=history_sorted, title=title)
     
-@app.route("/_history/<title>")
+@app.route("/history/<title>")
 def history(title):
     global back
     back = request.url
