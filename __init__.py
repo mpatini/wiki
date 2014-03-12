@@ -12,7 +12,7 @@ app.config.from_object(__name__)
 bcrypt = Bcrypt(app)
 
 app.config.update(dict(
-    DATABASE=os.path.join(app.instance_path, 'wiki.db'),
+    DATABASE=os.path.join(app.root_path, 'wiki.db'),
     DEBUG=True,
     SECRET_KEY='development key',
 ))
@@ -217,7 +217,7 @@ def history_homepage():
     push_title = title
     push_history_edit = False
     db = get_db()
-    cur = db.execute('SELECT title, text, my_date, version FROM entries ORDER BY id desc')
+    cur = db.execute('SELECT title, text, my_date, version, current FROM entries ORDER BY id desc')
     entries = cur.fetchall()
     # create list with appropriate names
     i = versions[title] - 1
@@ -235,6 +235,7 @@ def history_homepage():
                 version.append(entry['text'])
                 version.append(entry['version'])
                 version.append(entry['my_date'])
+                version.append(entry['current'])
     history_sorted = sorted(history, key=itemgetter(2), reverse=True)
     return render_template("history_index.html", history=history_sorted, title=title)
     
@@ -247,7 +248,7 @@ def history(title):
     push_title = title
     push_history_edit = False
     db = get_db()
-    cur = db.execute('SELECT title, text, my_date, version FROM entries ORDER BY id desc')
+    cur = db.execute('SELECT title, text, my_date, version, current FROM entries ORDER BY id desc')
     entries = cur.fetchall()
     # create list with appropriate names
     i = versions[title] - 1
@@ -364,5 +365,8 @@ app.secret_key = secret()
 
 if __name__ == '__main__':
     init_db()
-    app.run(host='107.170.69.45')
+    app.run(debug=True)
     #host='107.170.69.45'
+
+
+
