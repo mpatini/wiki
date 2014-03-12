@@ -6,7 +6,7 @@ from operator import itemgetter
 from flaskext.bcrypt import Bcrypt
 from secret import secret
 
-# create the app
+# create the app!again
 app = Flask(__name__, instance_path='/var/www/wiki/instance')
 app.config.from_object(__name__)
 bcrypt = Bcrypt(app)
