@@ -287,7 +287,7 @@ Sessions
 def signup():
     global back
     if 'username' in session:
-        return redirect(url_for('homepage'))
+        return redirect(back)
     else:
         return render_template('signup.html')
 
@@ -326,7 +326,7 @@ def register():
                  [username, hpw, current_date])
         db.commit()
         session['username'] = username
-        return redirect(url_for('homepage'))
+        return redirect(back)
 
 @app.route('/login_form')
 def login_form():
