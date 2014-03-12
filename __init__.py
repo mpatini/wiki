@@ -369,7 +369,7 @@ app.secret_key = secret()
 
 if __name__ == '__main__':
     init_db()
-    app.run(debug=True)#host='107.170.69.45'
+    app.run(host='107.170.69.45')#host='107.170.69.45'
 
 
 """
